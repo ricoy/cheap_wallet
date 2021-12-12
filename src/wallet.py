@@ -5,9 +5,9 @@ from hashlib import md5
 
 
 def get_cheap_wallet_table(
-    url: str, wallet: list, xpath_pvp: str, xpath_dy: str
+    url: str, wallet: list, xpath_pvp: str, xpath_dy: str, xpath_price: str
 ) -> list:
-    p_vp, dy = {}, {}
+    price, p_vp, dy = {}, {}, {}
     title = url.split("/")[3].replace("-", " ").upper()
     for wallet_item in wallet:
         url_website = str(url) + wallet_item
@@ -19,18 +19,30 @@ def get_cheap_wallet_table(
 
         p_vp[wallet_item] = get_text_from_xpath(html_content, xpath_pvp)
         dy[wallet_item] = get_text_from_xpath(html_content, xpath_dy)
+        price[wallet_item] = get_text_from_xpath(html_content, xpath_price)
 
     cheap_stocks = sorted(p_vp, key=p_vp.get)
-    table = [tuple((title, "P/VP", "DY"))]
+    table = [tuple((title, "P/VP", "DY", "PRICE"))]
     for wallet_item in cheap_stocks:
         table.append(
-            tuple((wallet_item.upper(), p_vp[wallet_item], dy[wallet_item] + "%"))
+            tuple(
+                (
+                    wallet_item.upper(),
+                    p_vp[wallet_item],
+                    dy[wallet_item] + "%",
+                    "R$ " + price[wallet_item],
+                )
+            )
         )
     return table
 
 
-def print_table(url: str, wallet: list, xpath_pvp: str, xpath_dy: str) -> None:
-    table = AsciiTable(get_cheap_wallet_table(url, wallet, xpath_pvp, xpath_dy))
+def print_table(
+    url: str, wallet: list, xpath_pvp: str, xpath_dy: str, xpath_price: str
+) -> None:
+    table = AsciiTable(
+        get_cheap_wallet_table(url, wallet, xpath_pvp, xpath_dy, xpath_price)
+    )
     print(table.table)
 
 
@@ -41,16 +53,18 @@ if __name__ == "__main__":
             settings.STOCKS,
             settings.XPATH_STOCKS_PVP,
             settings.XPATH_STOCKS_DY,
+            settings.XPATH_STOCKS_PRICE,
         ],
         [
             settings.URL_FIIS,
             settings.FIIS,
             settings.XPATH_FIIS_PVP,
             settings.XPATH_FIIS_DY,
+            settings.XPATH_FIIS_PRICE,
         ],
     ]
 
     print("Cheap wallet:")
     for w in wallets:
-        url, wallet, xpath_pvp, xpath_dy = w
-        print_table(url, wallet, xpath_pvp, xpath_dy)
+        url, wallet, xpath_pvp, xpath_dy, xpath_price = w
+        print_table(url, wallet, xpath_pvp, xpath_dy, xpath_price)
