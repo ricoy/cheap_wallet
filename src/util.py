@@ -16,7 +16,7 @@ def write_file(filename: str, content: str) -> None:
         file.write(content)
 
 
-def get_website_content(url: str) -> Optional[str]:
+def get_website_content(url: str) -> str:
     response = requests.get(url)
     if response.status_code != 200:
         raise ConnectionError("invalid url")

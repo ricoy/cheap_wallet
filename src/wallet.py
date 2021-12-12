@@ -29,7 +29,7 @@ def get_cheap_wallet_table(
     return table
 
 
-def print_table(url, wallet, xpath_pvp, xpath_dy):
+def print_table(url: str, wallet: list, xpath_pvp: str, xpath_dy: str) -> None:
     table = AsciiTable(get_cheap_wallet_table(url, wallet, xpath_pvp, xpath_dy))
     print(table.table)
 
