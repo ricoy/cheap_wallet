@@ -7,7 +7,7 @@ from hashlib import md5
 def get_cheap_wallet_table(
     url: str, wallet: list, xpath_pvp: str, xpath_dy: str, xpath_price: str
 ) -> list:
-    price, p_vp, dy = {}, {}, {}
+    price, p_vp, dy, max_price = {}, {}, {}, {}
     title = url.split("/")[3].replace("-", " ").upper()
     for wallet_item in wallet:
         url_website = str(url) + wallet_item
@@ -20,9 +20,12 @@ def get_cheap_wallet_table(
         p_vp[wallet_item] = get_text_from_xpath(html_content, xpath_pvp)
         dy[wallet_item] = get_text_from_xpath(html_content, xpath_dy)
         price[wallet_item] = get_text_from_xpath(html_content, xpath_price)
+        dy_value = (float(dy[wallet_item]) / 100) * float(price[wallet_item])
+        dy_expected = settings.MIN_DY_EXPECTED / 100
+        max_price[wallet_item] = round((dy_value / dy_expected), 2)
 
     cheap_stocks = sorted(p_vp, key=p_vp.get)
-    table = [tuple((title, "P/VP", "DY", "PRICE"))]
+    table = [tuple((title, "P/VP", "DY", "PRICE", "MAX_PRICE"))]
     for wallet_item in cheap_stocks:
         table.append(
             tuple(
@@ -31,6 +34,7 @@ def get_cheap_wallet_table(
                     p_vp[wallet_item],
                     dy[wallet_item] + "%",
                     "R$ " + price[wallet_item],
+                    "R$ " + str(max_price[wallet_item]),
                 )
             )
         )
@@ -63,7 +67,6 @@ if __name__ == "__main__":
             settings.XPATH_FIIS_PRICE,
         ],
     ]
-
     print("Cheap wallet:")
     for w in wallets:
         url, wallet, xpath_pvp, xpath_dy, xpath_price = w

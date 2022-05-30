@@ -16,3 +16,5 @@ URL_FIIS = str(os.environ.get("URL_FIIS"))
 XPATH_FIIS_PVP = str(os.environ.get("XPATH_FIIS_PVP"))
 XPATH_FIIS_DY = str(os.environ.get("XPATH_FIIS_DY"))
 XPATH_FIIS_PRICE = str(os.environ.get("XPATH_FIIS_PRICE"))
+
+MIN_DY_EXPECTED = float(str(os.environ.get("MIN_DY_EXPECTED")))
